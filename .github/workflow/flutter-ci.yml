@@ -2,12 +2,12 @@ name: Flutter CI
 
 on:
   push:
-    branches: [main, production]
+    branches: [development, main, production]
   pull_request:
-    branches: [main, production]
+    branches: [development, main, production]
 
-env:
-  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+# env:
+#   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 jobs:
   build:
