@@ -19,8 +19,7 @@ jobs:
 
       - uses: flutter-actions/setup-flutter@v2
         with:
-          flutter-version: "3.22.1"
-          cache: false
+          version: "3.22.5"
 
       - run: flutter pub get
 
