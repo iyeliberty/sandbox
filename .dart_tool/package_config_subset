@@ -95,9 +95,9 @@ vm_service
 file:///Users/jreliberty/.pub-cache/hosted/pub.dev/vm_service-14.3.1/
 file:///Users/jreliberty/.pub-cache/hosted/pub.dev/vm_service-14.3.1/lib/
 sandbox
-3.7
-file:///Users/jreliberty/DEV/sandbox/sandbox/
-file:///Users/jreliberty/DEV/sandbox/sandbox/lib/
+3.3
+file:///Users/jreliberty/DEV/sandbox/
+file:///Users/jreliberty/DEV/sandbox/lib/
 sky_engine
 3.7
 file:///Users/jreliberty/development/flutter/bin/cache/pkg/sky_engine/
