@@ -1,0 +1,39 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [main, production]
+  pull_request:
+    branches: [main, production]
+
+env:
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.22.0"
+
+      - run: flutter pub get
+
+      - name: Run static analysis
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test --coverage
+
+      # - name: SonarQube Scan
+      #   uses: SonarSource/sonarcloud-github-action@v2
+      #   with:
+      #     args: >
+      #       -Dsonar.projectKey=eliberty_flutter_tools
+      #       -Dsonar.organization=eliberty
+      #       -Dsonar.sources=lib
+      #       -Dsonar.host.url=https://sonarcloud.io
+      #       -Dsonar.login=${{ secrets.SONAR_TOKEN }}
