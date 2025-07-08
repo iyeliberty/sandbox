@@ -9,6 +9,7 @@
   },
   "scripts": {
     "prepare": "husky install",
+    "bump": "conventional-recommended-bump -p angular --commit-path .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -25,6 +26,8 @@
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
+    "conventional-changelog-angular": "^8.0.0",
+    "conventional-recommended-bump": "^11.2.0",
     "husky": "^8.0.0"
   }
 }
