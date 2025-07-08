@@ -1,0 +1,64 @@
+name: Semantic Release
+
+on:
+  workflow_run:
+    workflows: ["Flutter CI"]
+    types:
+      - completed
+
+jobs:
+  release:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install -g semantic-release conventional-changelog-cli conventional-recommended-bump
+
+      - name: Compute next version and generate changelog
+        run: |
+          CURRENT_VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //')
+          echo "Current version: $CURRENT_VERSION"
+
+          # Get recommended bump (major, minor, patch)
+          BUMP_TYPE=$(npx conventional-recommended-bump -p angular | grep '"releaseType"' | cut -d '"' -f4)
+          echo "Recommended bump: $BUMP_TYPE"
+
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+          if [ "$BUMP_TYPE" = "major" ]; then
+            MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0
+          elif [ "$BUMP_TYPE" = "minor" ]; then
+            MINOR=$((MINOR + 1)); PATCH=0
+          else
+            PATCH=$((PATCH + 1))
+          fi
+
+          NEXT_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "Next version: $NEXT_VERSION"
+
+          # Update version in pubspec.yaml
+          sed -i "s/^version: .*/version: $NEXT_VERSION/" pubspec.yaml
+
+          # Update iOS version in project.pbxproj
+          PBXPROJ_FILE="ios/Runner.xcodeproj/project.pbxproj"
+          sed -i '' "s/MARKETING_VERSION = .*/MARKETING_VERSION = $NEXT_VERSION;/g" "$PBXPROJ_FILE"
+
+          # Generate or update changelog
+          conventional-changelog -p angular -i CHANGELOG.md -s
+
+          # Commit & tag
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add pubspec.yaml CHANGELOG.md
+          git commit -m "chore(release): v$NEXT_VERSION [skip ci]" || echo "No changes to commit"
+          git tag "v$NEXT_VERSION"
+          git push origin HEAD:main --tags
