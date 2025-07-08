@@ -167,10 +167,10 @@
       "name": "sandbox",
       "rootUri": "../",
       "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "3.7"
     }
   ],
-  "generated": "2025-07-08T13:27:50.250546Z",
+  "generated": "2025-07-08T13:29:39.696030Z",
   "generator": "pub",
   "generatorVersion": "3.7.2",
   "flutterRoot": "file:///Users/jreliberty/development/flutter",
