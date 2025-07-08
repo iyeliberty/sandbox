@@ -54,7 +54,7 @@ jobs:
 
           # Update iOS version in project.pbxproj
           PBXPROJ_FILE="ios/Runner.xcodeproj/project.pbxproj"
-          sed -i '' "s/MARKETING_VERSION = .*/MARKETING_VERSION = $NEXT_VERSION;/g" "$PBXPROJ_FILE"
+          sed -i "s/MARKETING_VERSION = .*/MARKETING_VERSION = $NEXT_VERSION;/g" "$PBXPROJ_FILE"
 
           # Generate or update changelog
           conventional-changelog -p angular -i CHANGELOG.md -s
