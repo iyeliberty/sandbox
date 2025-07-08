@@ -1,0 +1,32 @@
+name: Block invalid PRs
+
+on:
+  pull_request:
+    branches:
+      - main
+      - production
+
+jobs:
+  block-non-dev-to-main:
+    if: github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Block if PR to main is not from development
+        run: |
+          echo "Source: ${{ github.head_ref }}"
+          if [[ "${{ github.head_ref }}" != "development" ]]; then
+            echo "❌ PR to main must come from development"
+            exit 1
+          fi
+
+  block-non-main-to-production:
+    if: github.base_ref == 'production'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Block if PR to production is not from main
+        run: |
+          echo "Source: ${{ github.head_ref }}"
+          if [[ "${{ github.head_ref }}" != "main" ]]; then
+            echo "❌ PR to production must come from main"
+            exit 1
+          fi

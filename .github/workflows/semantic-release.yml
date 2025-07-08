@@ -22,7 +22,11 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install -g semantic-release conventional-changelog-cli conventional-recommended-bump
+        run: |
+          npm install -g semantic-release \
+            conventional-changelog-cli \
+            conventional-recommended-bump \
+            conventional-changelog-angular
 
       - name: Compute next version and generate changelog
         run: |
@@ -50,7 +54,7 @@ jobs:
 
           # Update iOS version in project.pbxproj
           PBXPROJ_FILE="ios/Runner.xcodeproj/project.pbxproj"
-          sed -i '' "s/MARKETING_VERSION = .*/MARKETING_VERSION = $NEXT_VERSION;/g" "$PBXPROJ_FILE"
+          sed -i "s/MARKETING_VERSION = .*/MARKETING_VERSION = $NEXT_VERSION;/g" "$PBXPROJ_FILE"
 
           # Generate or update changelog
           conventional-changelog -p angular -i CHANGELOG.md -s
