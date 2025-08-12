@@ -1,0 +1,60 @@
+name: SonarQube Scan
+
+on:
+  workflow_run:
+    workflows: ["Flutter CI"]
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  sonarqube:
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      (
+          github.event.workflow_run.head_branch == 'main' ||
+          github.event.workflow_run.head_branch == 'development'
+      )
+    runs-on: ubuntu-latest
+    name: SonarQube
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: flutter-actions/setup-flutter@v2
+        with:
+          version: "3.29.3"
+          channel: "stable"
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-flutter-
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Download coverage artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+
+      - name: Recreate coverage folder
+        run: |
+          mkdir -p coverage
+          mv lcov.info coverage/lcov.info
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=eliberty_flutter_tools
+            -Dsonar.organization=eliberty
+            -Dsonar.sources=lib
+            -Dsonar.host.url=https://sonarcloud.io
