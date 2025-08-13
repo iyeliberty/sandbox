@@ -61,6 +61,8 @@ jobs:
           NEXT_VERSION="$MAJOR.$MINOR.$PATCH"
           echo "Next version: $NEXT_VERSION"
 
+          echo "next_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
+
           # Update version in pubspec.yaml
           sed -i "s/^version: .*/version: $NEXT_VERSION/" pubspec.yaml
 
@@ -69,7 +71,7 @@ jobs:
           sed -i "s/MARKETING_VERSION = .*/MARKETING_VERSION = $NEXT_VERSION;/g" "$PBXPROJ_FILE"
 
           # Generate or update changelog
-          conventional-changelog -p angular -i CHANGELOG.md -s
+          npx conventional-changelog -p angular -i CHANGELOG.md -s
 
           # Commit & tag (DEPRECATED)
           # git config user.name "github-actions[bot]"
@@ -81,19 +83,19 @@ jobs:
 
       - name: Commit updated files
         run: |
-          git checkout -b release/v${{ steps.versioning.outputs.NEXT_VERSION }}
+          git checkout -b release/v${{ steps.versioning.outputs.next_version }}
           git add pubspec.yaml ios/Runner.xcodeproj/project.pbxproj CHANGELOG.md
-          git commit -m "chore(release): v${{ steps.versioning.outputs.NEXT_VERSION }} [skip ci]"
+          git commit -m "chore(release): v${{ steps.versioning.outputs.next_version }} [skip ci]"
 
       - name: Push release branch
         run: |
-          git push origin release/v${{ steps.versioning.outputs.NEXT_VERSION }}
+          git push origin release/v${{ steps.versioning.outputs.next_version }} --set-upstream
 
       - name: Open Pull Request to main
         uses: peter-evans/create-pull-request@v6
         with:
-          branch: release/v${{ steps.versioning.outputs.NEXT_VERSION }}
-          title: "chore(release): v${{ steps.versioning.outputs.NEXT_VERSION }}"
-          body: "This PR prepares version `${{ steps.versioning.outputs.NEXT_VERSION }}` with changelog and version bump."
+          branch: release/v${{ steps.versioning.outputs.next_version }}
+          title: "chore(release): v${{ steps.versioning.outputs.next_version }}"
+          body: "This PR prepares version `${{ steps.versioning.outputs.next_version }}` with changelog and version bump."
           base: main
           delete-branch: false
